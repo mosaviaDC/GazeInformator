@@ -24,12 +24,13 @@ namespace GazeInformator
         public static extern bool FreeConsole();
         static void Main(string[] args)
         {
-         
+
 
 
             var host = new Host();
-           
+            
             ManagementObjectSearcher mydisplayResolution = new ManagementObjectSearcher("SELECT CurrentHorizontalResolution, CurrentVerticalResolution FROM Win32_VideoController");
+       
             foreach (ManagementObject record in mydisplayResolution.Get())
             {
 
@@ -39,15 +40,16 @@ namespace GazeInformator
             }
 
             //Vizualization Thread (No filteres, no latency)
-            var gazePointDataStream = host.Streams.CreateGazePointDataStream(Tobii.Interaction.Framework.GazePointDataMode.Unfiltered);
-            gazePointDataStream.GazePoint((gazePointX, gazePointY, _ts) =>
-            {
+            var gazePointDataStream = host.Streams.CreateGazePointDataStream();
+            gazePointDataStream.Next += GazePointDataStream_Next;
+            //gazePointDataStream.GazePoint((gazePointX, gazePointY, _ts) =>
+            //{
 
-                values[0] = TransformToNormCoordinates(gazePointX, Width);
-                values[1] = TransformToNormCoordinates(gazePointY, Height);
-                values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-               
-            });
+            //    values[0] = TransformToNormCoordinates(gazePointX, Width);
+            //    values[1] = TransformToNormCoordinates(gazePointY, Height);
+            //    values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+             
+            //});
 
             //var gazeFixationDataStream = host.Streams.CreateFixationDataStream(Tobii.Interaction.Framework.FixationDataMode.Sensitive);
 
@@ -71,6 +73,15 @@ namespace GazeInformator
 
         }
 
+        private static void GazePointDataStream_Next(object sender, StreamData<GazePointData> e)
+
+        {
+            values[0] = TransformToNormCoordinates(e.Data.X, Width);
+            values[1] = TransformToNormCoordinates(e.Data.Y, Height);
+            values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            
+        }
+
         static  void SendData()
         {
        
@@ -79,7 +90,7 @@ namespace GazeInformator
       
           //  UdpClient udpClient = new UdpClient("127.0.0.1", 5444);
             byte[] bytes = new byte[values.Length * sizeof(double)];
-           FreeConsole();
+             FreeConsole();
             while (true)
             {
                 Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");
