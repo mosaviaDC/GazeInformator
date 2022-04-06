@@ -14,12 +14,14 @@ namespace GazeInformator
 {
   
 
-    class Program
+    class Program:IDisposable
     {
         private static double[] values = new double[7];
 
         private static double Width;
         private static double Height;
+        private static Host host;
+
         [DllImport("kernel32.dll")]
         public static extern bool FreeConsole();
         static void Main(string[] args)
@@ -27,7 +29,7 @@ namespace GazeInformator
 
 
 
-            var host = new Host();
+         host = new Host();
             
             ManagementObjectSearcher mydisplayResolution = new ManagementObjectSearcher("SELECT CurrentHorizontalResolution, CurrentVerticalResolution FROM Win32_VideoController");
        
@@ -40,46 +42,33 @@ namespace GazeInformator
             }
 
             //Vizualization Thread (No filteres, no latency)
-            var gazePointDataStream = host.Streams.CreateGazePointDataStream();
+            var gazePointDataStream = host.Streams.CreateGazePointDataStream(Tobii.Interaction.Framework.GazePointDataMode.Unfiltered);
             gazePointDataStream.Next += GazePointDataStream_Next;
+
             //gazePointDataStream.GazePoint((gazePointX, gazePointY, _ts) =>
             //{
 
             //    values[0] = TransformToNormCoordinates(gazePointX, Width);
             //    values[1] = TransformToNormCoordinates(gazePointY, Height);
             //    values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-             
-            //});
-
-            //var gazeFixationDataStream = host.Streams.CreateFixationDataStream(Tobii.Interaction.Framework.FixationDataMode.Sensitive);
-
-            //gazeFixationDataStream.Begin((gazePointX, gazePointY, _ts) =>
-            //{
-
-            //    values[2] = TransformToNormCoordinates(gazePointX, Width);
-            //    values[3] = TransformToNormCoordinates(gazePointY, Height);
-
 
             //});
 
-            //gazeFixationDataStream.End((gazePointX, gazePointY, _ts) =>
-            //{
-            //    values[4] = TransformToNormCoordinates(gazePointX, Width);
-            //    values[5] = TransformToNormCoordinates(gazePointY, Height);
-            //    values[6] = DateTimeOffset.Now.ToUnixTimeSeconds();
-            //});
             Thread UdpThread = new Thread(new ThreadStart(SendData));
             UdpThread.Start();
 
         }
 
+        
+
         private static void GazePointDataStream_Next(object sender, StreamData<GazePointData> e)
 
         {
+
             values[0] = TransformToNormCoordinates(e.Data.X, Width);
             values[1] = TransformToNormCoordinates(e.Data.Y, Height);
             values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            
+
         }
 
         static  void SendData()
@@ -90,10 +79,11 @@ namespace GazeInformator
       
           //  UdpClient udpClient = new UdpClient("127.0.0.1", 5444);
             byte[] bytes = new byte[values.Length * sizeof(double)];
-             FreeConsole();
+            FreeConsole();
             while (true)
             {
-                Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");
+              Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");
+      
                 Buffer.BlockCopy(values, 0, bytes, 0, bytes.Length);
                 udpClient.Send(bytes, bytes.Length);
             }
@@ -105,6 +95,10 @@ namespace GazeInformator
             return Convert.ToDouble((value * (2 / (koef))) - 1f);
         }
 
+        public void Dispose()
+        {
+            host.Dispose();
+        }
 
     }
 }
