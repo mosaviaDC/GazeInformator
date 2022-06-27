@@ -89,6 +89,7 @@ namespace GazeInformator
             }
         }
 
+
         static double TransformToNormCoordinates(double value, double koef)
         {
 
