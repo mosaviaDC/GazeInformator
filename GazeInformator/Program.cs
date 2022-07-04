@@ -68,7 +68,7 @@ namespace GazeInformator
             values[0] = TransformToNormCoordinates(e.Data.X, Width);
             values[1] = TransformToNormCoordinates(e.Data.Y, Height);
             values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
+            //Debug.WriteLine(e.Data.X);
         }
 
         static  void SendData()
@@ -79,7 +79,8 @@ namespace GazeInformator
       
           //  UdpClient udpClient = new UdpClient("127.0.0.1", 5444);
             byte[] bytes = new byte[values.Length * sizeof(double)];
-            FreeConsole();
+         //   FreeConsole();
+        
             while (true)
             {
               Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");
