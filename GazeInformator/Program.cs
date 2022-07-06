@@ -21,6 +21,7 @@ namespace GazeInformator
         private static double Width;
         private static double Height;
         private static Host host;
+        private static FixationDataStream fixationDataStream;
 
         [DllImport("kernel32.dll")]
         public static extern bool FreeConsole();
@@ -41,34 +42,19 @@ namespace GazeInformator
 
             }
 
-            //Vizualization Thread (No filteres, no latency)
-            var gazePointDataStream = host.Streams.CreateGazePointDataStream(Tobii.Interaction.Framework.GazePointDataMode.Unfiltered);
-            gazePointDataStream.Next += GazePointDataStream_Next;
-
-            //gazePointDataStream.GazePoint((gazePointX, gazePointY, _ts) =>
-            //{
-
-            //    values[0] = TransformToNormCoordinates(gazePointX, Width);
-            //    values[1] = TransformToNormCoordinates(gazePointY, Height);
-            //    values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-            //});
+            fixationDataStream = host.Streams.CreateFixationDataStream(Tobii.Interaction.Framework.FixationDataMode.Slow);
+            fixationDataStream.Next += FixationDataStream_Next;
 
             Thread UdpThread = new Thread(new ThreadStart(SendData));
             UdpThread.Start();
 
         }
 
-        
-
-        private static void GazePointDataStream_Next(object sender, StreamData<GazePointData> e)
-
+        private static void FixationDataStream_Next(object sender, StreamData<FixationData> e)
         {
-
             values[0] = TransformToNormCoordinates(e.Data.X, Width);
             values[1] = TransformToNormCoordinates(e.Data.Y, Height);
             values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            //Debug.WriteLine(e.Data.X);
         }
 
         static  void SendData()

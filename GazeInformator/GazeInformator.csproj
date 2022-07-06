@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <None Update="App.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="Tobii.EyeX.Client.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
