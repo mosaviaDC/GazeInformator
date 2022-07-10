@@ -83,27 +83,25 @@ namespace GazeInformator
         {
             values[0] = TransformToNormCoordinates(e.Data.X, Width);
             values[1] = TransformToNormCoordinates(e.Data.Y, Height);
-       //     Debug.WriteLine(e.Data.Timestamp);
             values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
 
         private  static void  StartVideoRecording()
         {
 
-            string argument = @"-f gdigrab  -r 20 -show_region 1 -video_size 1920x1080  -i desktop   -f rawvideo  -vcodec mjpeg -preset ultrafast  -crf:v 17 -tune zerolatency -threads 4   -b:v 1M  -filter:v fps=90  -filter:v " + " setpts=1*PTS " + $"udp://{ConfigurationManager.AppSettings["DestinationIP"]}:7777";
+            string argument = @"-f gdigrab  -r 60  -i desktop   -f mjpeg  -vcodec mjpeg -preset ultrafast  -tune zerolatency -threads 1    -filter:v" + " setpts=1.2*PTS " + $"udp://{ConfigurationManager.AppSettings["DestinationIP"]}:7777";
             process = new Process();
             {
-                Debug.WriteLine("StartVideo");
+                
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.CreateNoWindow = false;
-                process.StartInfo.FileName = @"C:\Users\User\Source\Repos\GazeView\GazeViewer\FFmpeg\ffmpeg.exe";
+                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.FileName = @"FFmpeg\ffmpeg.exe";
                 process.StartInfo.Arguments = argument;
                 process.Start();
-                //process.WaitForExit();
-
             }
+            Debug.WriteLine("StartVideo");
 
         }
 
@@ -115,15 +113,11 @@ namespace GazeInformator
        
   
             UdpClient udpClient = new UdpClient(ConfigurationManager.AppSettings["DestinationIP"], int.Parse(ConfigurationManager.AppSettings["DestinationPort"]));
-      
-          //  UdpClient udpClient = new UdpClient("127.0.0.1", 5444);
             byte[] bytes = new byte[values.Length * sizeof(double)];
-         //   FreeConsole();
         
             while (true)
             {
-                //      Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");)
-                //Thread.Sleep(561);
+               //       Debug.WriteLine($"Xpos {values[0]} Ypos {values[1]}");
                 Buffer.BlockCopy(values, 0, bytes, 0, bytes.Length);
                 udpClient.Send(bytes, bytes.Length);
             }
@@ -139,7 +133,7 @@ namespace GazeInformator
         public void Dispose()
         {
             host.Dispose();
-            process.Close();
+            process.Kill();
         }
 
     }
