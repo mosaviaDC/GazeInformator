@@ -89,7 +89,8 @@ namespace GazeInformator
         private  static void  StartVideoRecording()
         {
 
-            string argument = @"-f gdigrab  -r 60  -i desktop   -f mjpeg  -vcodec mjpeg -preset ultrafast  -tune zerolatency -threads 1    -filter:v" + " setpts=1.2*PTS " + $"udp://{ConfigurationManager.AppSettings["DestinationIP"]}:7777";
+            string argument = ConfigurationManager.AppSettings["FFmpegCommand"] +
+                $" udp://{ConfigurationManager.AppSettings["DestinationIP"]}:7777";
             process = new Process();
             {
                 
