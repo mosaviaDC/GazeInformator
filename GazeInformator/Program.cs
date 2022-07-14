@@ -90,14 +90,14 @@ namespace GazeInformator
         {
 
             string argument = ConfigurationManager.AppSettings["FFmpegCommand"] +
-                $" udp://{ConfigurationManager.AppSettings["DestinationIP"]}:7777";
+                $" udp://{ConfigurationManager.AppSettings["DestinationIP"]}:{ConfigurationManager.AppSettings["FFmpegPort"]}";
             process = new Process();
             {
                 
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.FileName = @"FFmpeg\ffmpeg.exe";
                 process.StartInfo.Arguments = argument;
                 process.Start();
