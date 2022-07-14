@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <None Update="App.config">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="FFmpeg\avcodec-58.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -56,7 +56,7 @@ namespace GazeInformator
 
         private static async void UDPReceive()
         {
-           ReceiveUDPClient = new UdpClient(7000);
+           ReceiveUDPClient = new UdpClient(7003);
             while (true)
             {
               
