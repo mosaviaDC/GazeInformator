@@ -106,7 +106,7 @@ namespace GazeInformator
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.CreateNoWindow = false;
+                process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.FileName = @"FFmpeg\ffmpeg.exe";
                 process.StartInfo.Arguments = argument;
                 process.Start();
