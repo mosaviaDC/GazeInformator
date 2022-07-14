@@ -56,7 +56,7 @@ namespace GazeInformator
 
         private static async void UDPReceive()
         {
-           ReceiveUDPClient = new UdpClient(7003);
+           ReceiveUDPClient = new UdpClient(7000);
             while (true)
             {
               
@@ -106,7 +106,7 @@ namespace GazeInformator
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.FileName = @"FFmpeg\ffmpeg.exe";
                 process.StartInfo.Arguments = argument;
                 process.Start();
