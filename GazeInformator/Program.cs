@@ -80,23 +80,8 @@ namespace GazeInformator
                         Environment.Exit(0);
                      
                     break;
-
-                   
-
-
                 }
-                
-
-
-                if (result.Buffer[0] == 1)
-                {
                
-                 
-                }
-                else if (result.Buffer[0] == 0)
-                {
-                   
-                }
             }
 
         }
