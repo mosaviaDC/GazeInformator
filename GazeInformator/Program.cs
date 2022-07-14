@@ -61,17 +61,41 @@ namespace GazeInformator
             {
               
                 var result = await ReceiveUDPClient.ReceiveAsync();
+                switch (result.Buffer[0])
+                {
+                    case 0:
+                        if (process != null)
+                            process.Kill();
+                        process = null;
+                        break;
+
+                    case 1:
+                        if (process == null)
+                            StartVideoRecording();     //Запуск видео
+                        break;
+                    case 2:
+                        if (process != null)
+                            process.Kill();
+                        process = null;
+                        Environment.Exit(0);
+                     
+                    break;
+
+                   
+
+
+                }
+                
+
+
                 if (result.Buffer[0] == 1)
                 {
-                    //Запуск видео
-                    if (process == null)
-                    StartVideoRecording();
+               
+                 
                 }
                 else if (result.Buffer[0] == 0)
                 {
-                    if (process != null)
-                        process.Kill();
-                    process = null;
+                   
                 }
             }
 
@@ -97,7 +121,7 @@ namespace GazeInformator
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardInput = true;
                 process.StartInfo.RedirectStandardOutput = false;
-                process.StartInfo.CreateNoWindow = false;
+                process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.FileName = @"FFmpeg\ffmpeg.exe";
                 process.StartInfo.Arguments = argument;
                 process.Start();
