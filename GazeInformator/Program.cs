@@ -23,6 +23,7 @@ namespace GazeInformator
         private static Host host;
         private static FixationDataStream fixationDataStream;
         private  static Process process;
+        private static double Monitor;
 
         public static UdpClient ReceiveUDPClient { get; private set; }
 
@@ -45,6 +46,8 @@ namespace GazeInformator
 
             }
 
+            Monitor = Height / Width;
+
             fixationDataStream = host.Streams.CreateFixationDataStream(Tobii.Interaction.Framework.FixationDataMode.Slow);
             fixationDataStream.Next += FixationDataStream_Next;
 
@@ -56,7 +59,7 @@ namespace GazeInformator
 
         private static async void UDPReceive()
         {
-           ReceiveUDPClient = new UdpClient(7000);
+           ReceiveUDPClient = new UdpClient(int.Parse(ConfigurationManager.AppSettings["RecievePort"]));
             while (true)
             {
               
@@ -92,6 +95,7 @@ namespace GazeInformator
         {
             values[0] = TransformToNormCoordinates(e.Data.X, Width);
             values[1] = TransformToNormCoordinates(e.Data.Y, Height);
+            values[2] = Monitor;
             values[6] = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
 
